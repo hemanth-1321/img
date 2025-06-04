@@ -6,6 +6,8 @@ import { prisma } from "@/lib/config";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Creator } from "@/components/creater";
+import Image from "next/image";
+import Style from "@/components/style";
 
 export default async function page() {
   const serverSession = await getServerSession(authOptions);
