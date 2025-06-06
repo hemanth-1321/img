@@ -45,7 +45,11 @@ const presets = {
 };
 const fontOptions = ["Arial", "Inter", "Domine"];
 
-export const Creator: React.FC = () => {
+type CreatorProps = {
+  children: React.ReactNode;
+};
+
+export const Creator: React.FC<CreatorProps> = ({ children }) => {
   const [selectedStyle, setSelectedStyle] = useState("style2");
   const [loading, setLoading] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -290,6 +294,7 @@ export const Creator: React.FC = () => {
             />
           </div>
           <Drop setSelectedImage={setSelectedImage} />
+          <div className="mt-8">{children}</div>
         </div>
       )}
     </>
