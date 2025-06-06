@@ -41,15 +41,6 @@ export default async function page() {
             </div>
           ) : (
             <div className="px-6 md:px-10">
-              <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-                Hi there
-              </h1>
-              <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-                Want to create a thumbnail?
-              </h2>
-              <p className="text-muted-foreground mt-4 leading-7">
-                Select one of our templates
-              </p>
               <div className="mt-6 w-full">
                 <Creator />
               </div>
