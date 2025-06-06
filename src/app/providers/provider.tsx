@@ -1,6 +1,6 @@
 "use client";
 
-import Appbar from "@/components/Appbar";
+import { Appbar } from "@/components/Appbar";
 import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 

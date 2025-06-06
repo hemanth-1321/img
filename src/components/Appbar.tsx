@@ -1,35 +1,71 @@
 "use client";
-
+import {
+  Navbar,
+  NavBody,
+  MobileNav,
+  NavbarLogo,
+  NavbarButton,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from "@/components/ui/resizable-navbar";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useState } from "react";
 
-export default function Appbar() {
+export function Appbar() {
   const { data: session } = useSession();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleAuthClick = () => {
+    if (session) {
+      signOut();
+    } else {
+      signIn();
+    }
+  };
 
   return (
-    <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-      <div className="text-xl font-bold text-gray-900">MyApp</div>
+    <div className="relative w-full">
+      <Navbar>
+        {/* Desktop Navigation */}
+        <NavBody>
+          <NavbarLogo />
+          <div className="flex items-center gap-4">
+            <NavbarButton onClick={handleAuthClick} variant="secondary">
+              {session ? "Logout" : "Login"}
+            </NavbarButton>
+          </div>
+        </NavBody>
 
-      {session ? (
-        <div className="flex items-center space-x-4">
-          <span className="text-gray-700">
-            Signed in as{" "}
-            <span className="font-semibold">{session.user?.email}</span>
-          </span>
-          <button
-            onClick={() => signOut()}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded shadow-md transition duration-200"
+        {/* Mobile Navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            <NavbarLogo />
+            <MobileNavToggle
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            />
+          </MobileNavHeader>
+
+          <MobileNavMenu
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
           >
-            Sign Out
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => signIn()}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-md transition duration-200"
-        >
-          Sign In
-        </button>
-      )}
-    </nav>
+            <div className="flex w-full flex-col gap-4">
+              <NavbarButton
+                onClick={() => {
+                  handleAuthClick();
+                  setIsMobileMenuOpen(false);
+                }}
+                variant="primary"
+                className="w-full"
+              >
+                {session ? "Logout" : "Login"}
+              </NavbarButton>
+            </div>
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
+    </div>
   );
 }

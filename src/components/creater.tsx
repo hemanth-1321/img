@@ -21,6 +21,7 @@ import {
   SelectItem,
   SelectValue,
 } from "./ui/select";
+import { domine, inter } from "@/app/fonts";
 
 const presets = {
   style1: {
@@ -62,7 +63,7 @@ export const Creator: React.FC = () => {
 
     setLoading(true);
     console.log("🔄 Image upload started");
-
+    //bg-removal
     setTimeout(() => {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -127,6 +128,14 @@ export const Creator: React.FC = () => {
       ctx.textBaseline = "middle";
       let fontSize = 100;
       let selectFont = font;
+      switch (font) {
+        case "inter":
+          selectFont = inter.style.fontFamily;
+          break;
+        case "domine":
+          selectFont = domine.style.fontFamily;
+          break;
+      }
       ctx.font = `${preset.fontWeight} ${fontSize}px ${selectFont}`;
       const textWidth = ctx.measureText(text).width;
       const targetwidth = canvas.width * 0.9;
@@ -187,7 +196,6 @@ export const Creator: React.FC = () => {
                       ref={canvasRef}
                       className="max-h-lg h-auto w-full max-w-lg rounded"
                     />
-                    <Button onClick={handleDownload}>download</Button>
                   </div>
                   <Card className="w-full max-w-lg border border-gray-200 shadow-md rounded-2xl">
                     <CardHeader>
