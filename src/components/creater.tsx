@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { domine, inter } from "@/app/fonts";
+import { getPreSignedUrl } from "@/app/actions/aws";
 
 const presets = {
   style1: {
@@ -169,6 +170,8 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
       link.download = `image.png`;
       link.href = canvasRef.current.toDataURL();
       link.click();
+
+      const uploadurl = await getPreSignedUrl();
     }
   };
 

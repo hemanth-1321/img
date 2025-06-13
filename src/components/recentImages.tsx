@@ -29,6 +29,22 @@ export const RecentImages = () => {
           />
           <Button>Download</Button>
         </div>
+        <div className="flex min-w-fit flex-col gap-2">
+          <img
+            src="test.jpg"
+            alt="image"
+            className="h-56 w-auto rounded-lg object-contain"
+          />
+          <Button>Download</Button>
+        </div>{" "}
+        <div className="flex min-w-fit flex-col gap-2">
+          <img
+            src="test.jpg"
+            alt="image"
+            className="h-56 w-auto rounded-lg object-contain"
+          />
+          <Button>Download</Button>
+        </div>
       </div>
     </div>
   );
