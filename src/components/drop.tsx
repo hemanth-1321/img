@@ -6,7 +6,7 @@ type DropProps = {
 
 export const Drop: React.FC<DropProps> = ({ setSelectedImage }) => {
   return (
-    <div className="relative w-full">
+    <div className="relative w-full mt-10">
       <input
         onChange={(e) => setSelectedImage(e.target.files?.[0])}
         type="file"

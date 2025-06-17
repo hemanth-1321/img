@@ -25,6 +25,7 @@ import {
 import { domine, inter } from "@/app/fonts";
 import { getPreSignedUrl } from "@/app/actions/aws";
 import { toast } from "sonner";
+import { Slider } from "./ui/slider";
 
 const presets = {
   style1: {
@@ -58,10 +59,11 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [text, setText] = useState("hemanth");
   const [font, setFont] = useState("Arial");
-
+  const [fontpx, setFontpx] = useState(100);
   const [processedImageSrc, setProcessedImageSrc] = useState<string | null>(
     null
   );
+
   const [canvasReady, setCanvasReady] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -102,11 +104,16 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
 
   useEffect(() => {
     if (canvasReady && processedImageSrc) {
+      drawCompositeImage();
+    }
+  }, [text, font, fontpx, selectedStyle]);
+
+  useEffect(() => {
+    if (canvasReady && processedImageSrc) {
       console.log("🖼 Drawing image to canvas...");
       drawCompositeImage();
     }
   }, [canvasReady, processedImageSrc]);
-
   const drawCompositeImage = () => {
     if (!canvasRef.current || !processedImageSrc || !imageSrc) return;
 
@@ -116,11 +123,16 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
 
     const img = new Image();
     img.onload = () => {
+      // Set canvas size to match image
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw background image
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       console.log("🖌️ Image drawn on canvas");
+
+      // Determine style preset
       let preset = presets.style1;
       switch (selectedStyle) {
         case "style2":
@@ -130,42 +142,69 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
           preset = presets.style3;
           break;
       }
+
+      // Set up font and style
       ctx.save();
       ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      let fontSize = 100;
-      let selectFont = font;
-      switch (font) {
+
+      switch (selectedStyle) {
+        case "style1":
+          ctx.textBaseline = "hanging";
+          break;
+        case "style3":
+          ctx.textBaseline = "top";
+          break;
+        default:
+          ctx.textBaseline = "middle";
+      }
+
+      let fontSize = fontpx;
+      let selectedFontFamily = font;
+
+      // Map custom font styles if needed
+      switch (selectedFontFamily) {
         case "inter":
-          selectFont = inter.style.fontFamily;
+          selectedFontFamily = inter.style.fontFamily;
           break;
         case "domine":
-          selectFont = domine.style.fontFamily;
+          selectedFontFamily = domine.style.fontFamily;
           break;
       }
-      ctx.font = `${preset.fontWeight} ${fontSize}px ${selectFont}`;
-      const textWidth = ctx.measureText(text).width;
-      const targetwidth = canvas.width * 0.9;
-      fontSize *= targetwidth / textWidth;
-      ctx.font = `${preset.fontWeight} ${fontSize}px ${selectFont}`;
+
+      ctx.font = `${preset.fontWeight} ${fontSize}px ${selectedFontFamily}`;
       ctx.fillStyle = preset.color;
       ctx.globalAlpha = preset.opacity;
-      const x = canvas.width / 2;
-      const y = canvas.height / 2;
-      ctx.translate(x, y);
-      ctx.fillText(text, 0, 0);
+
+      // Position and draw text
+      let x = canvas.width / 2;
+      let y = canvas.height / 2;
+
+      if (selectedStyle === "style3") {
+        // For top-aligned text
+        y = fontSize * 1.2; // Add some top margin based on font size
+        ctx.fillText(text, x, y);
+      } else {
+        // Centered text styles
+        ctx.translate(x, y);
+        ctx.fillText(text, 0, 0);
+      }
+
       ctx.restore();
 
+      // Draw processed foreground image
       const fgImg = new Image();
       fgImg.onload = () => {
         ctx.drawImage(fgImg, 0, 0, canvas.width, canvas.height);
       };
       fgImg.src = processedImageSrc;
     };
+
     img.onerror = (err) =>
       console.error("🛑 Error loading image onto canvas:", err);
+
     img.src = imageSrc;
   };
+
   const handleDownload = async () => {
     if (canvasRef.current) {
       const link = document.createElement("a");
@@ -195,13 +234,33 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
     }
   };
 
+  const handleReset = () => {
+    setText("Pov");
+    setFont("Arial");
+    setFontpx(100);
+  };
   return (
     <>
       {imageSrc ? (
         <>
           {loading ? (
-            <div className="flex items-center justify-center min-h-[200px]">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-dashed border-gray-800 border-t-transparent"></div>
+            <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6 text-center">
+              {/* Spinner */}
+              <div className="relative">
+                <div className="h-14 w-14 rounded-full border-4 border-dashed border-teal-600 animate-spin border-t-transparent"></div>
+                <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-teal-600 animate-pulse">
+                  🔄
+                </div>
+              </div>
+
+              {/* Message */}
+              <div>
+                <blockquote className="mt-4 text-lg italic text-gray-600 max-w-md px-4">
+                  Please hang tight... we're working on your image! ⚡️
+                  <br />
+                  Larger files may take a few extra seconds 🚀
+                </blockquote>
+              </div>
             </div>
           ) : (
             <>
@@ -276,11 +335,29 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
                           </Select>
                         </div>
                       </div>
+
+                      <div className="w-full flex flex-col space-y-2">
+                        <Label className="text-sm text-gray-700">
+                          Font Size
+                        </Label>
+                        <div className="flex items-center gap-4">
+                          <Slider
+                            value={[fontpx]}
+                            onValueChange={(val) => setFontpx(val[0])}
+                            max={200}
+                            step={1}
+                            className="flex-1"
+                          />
+                          <span className="text-sm text-gray-600 w-12 text-right">
+                            {fontpx}px
+                          </span>
+                        </div>
+                      </div>
                     </CardContent>
 
                     <CardFooter className="flex flex-wrap justify-between gap-2 pt-4">
                       <Button onClick={handleDownload}>Download</Button>
-                      <Button onClick={drawCompositeImage}>Update</Button>
+                      <Button onClick={handleReset}>reset</Button>
                     </CardFooter>
                   </Card>
                 </div>

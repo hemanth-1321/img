@@ -48,7 +48,7 @@ export default async function page() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-[#f5f5f5] h-screen">
+    <main className="min-h-screen flex items-center justify-center px-4 bg-[#f5f5f5]">
       <div className="w-full max-w-3xl">
         <div className="flex flex-col gap-6 items-center text-center">
           {user.credits === 0 ? (
