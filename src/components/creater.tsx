@@ -5,6 +5,7 @@ import Style from "./style";
 import { removeBackground } from "@imgly/background-removal";
 import { Button } from "./ui/button";
 import { MoveLeft } from "lucide-react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -23,6 +24,7 @@ import {
 } from "./ui/select";
 import { domine, inter } from "@/app/fonts";
 import { getPreSignedUrl } from "@/app/actions/aws";
+import { toast } from "sonner";
 
 const presets = {
   style1: {
@@ -171,7 +173,25 @@ export const Creator: React.FC<CreatorProps> = ({ children }) => {
       link.href = canvasRef.current.toDataURL();
       link.click();
 
-      const uploadurl = await getPreSignedUrl();
+      canvasRef.current.toBlob(async (blob) => {
+        if (blob) {
+          try {
+            const uploadurl = await getPreSignedUrl();
+
+            await axios.put(uploadurl, blob, {
+              headers: {
+                "Content-Type": "image/png",
+              },
+            });
+
+            toast.success("Image uploaded successfully", {});
+          } catch (error) {
+            toast.error("Upload failed ❌", {
+              description: "Please try again or check your network.",
+            });
+          }
+        }
+      });
     }
   };
 

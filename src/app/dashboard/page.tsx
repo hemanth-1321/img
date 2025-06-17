@@ -48,10 +48,10 @@ export default async function page() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
+    <main className="min-h-screen flex items-center justify-center px-4 bg-[#f5f5f5] h-screen">
       <div className="w-full max-w-3xl">
         <div className="flex flex-col gap-6 items-center text-center">
-          {user.credits === 1 ? (
+          {user.credits === 0 ? (
             <div className="px-6 md:px-10">
               <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
                 Hi there
