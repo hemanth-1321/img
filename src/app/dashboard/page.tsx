@@ -7,10 +7,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Creator } from "@/components/creater";
 import { RecentImages } from "@/components/recentImages";
+
 export default async function page() {
   const serverSession = await getServerSession(authOptions);
 
-  // If no session, show login prompt
   if (!serverSession || !serverSession.user?.email) {
     return (
       <main className="min-h-screen flex items-center justify-center px-4">
@@ -24,7 +24,6 @@ export default async function page() {
     );
   }
 
-  // If session exists, get user from DB
   const user = await prisma.user.findUnique({
     where: {
       email: serverSession.user.email,
@@ -48,39 +47,31 @@ export default async function page() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-[#f5f5f5]">
-      <div className="w-full max-w-3xl">
-        <div className="flex flex-col gap-6 items-center text-center">
-          {user.credits === 0 ? (
-            <div className="px-6 md:px-10">
-              <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-                Hi there
-              </h1>
-              <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-                Want to create a thumbnail?
-              </h2>
-              <p className="text-muted-foreground mt-4 leading-7">
-                Buy more credits to continue generating thumbnails
-              </p>
-              <Link href="/dashboard/pricing">
-                <Button className="mt-4">Buy credits</Button>
-              </Link>
-              <div className="font-bold mt-10">See recent thumbnails</div>
-              <div>
-                <RecentImages />
-              </div>
-            </div>
-          ) : (
-            <div className="px-6 md:px-10">
-              <div className="mt-6 w-full">
-                <Creator>
-                  <RecentImages />
-                </Creator>
-              </div>
-            </div>
-          )}
+    <main className="min-h-screen w-full bg-[#f5f5f5]">
+      {user.credits === 0 ? (
+        <div className="min-h-screen flex flex-col items-center justify-center px-6 md:px-10 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+            Hi there
+          </h1>
+          <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+            Want to create a thumbnail?
+          </h2>
+          <p className="text-muted-foreground mt-4 leading-7">
+            Buy more credits to continue generating thumbnails
+          </p>
+          <Link href="/dashboard/pricing">
+            <Button className="mt-4">Buy credits</Button>
+          </Link>
+          <div className="font-bold mt-10">See recent thumbnails</div>
+          <div>
+            <RecentImages />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full h-screen">
+          <Creator />
+        </div>
+      )}
     </main>
   );
 }
